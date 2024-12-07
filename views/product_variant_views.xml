@@ -1,0 +1,73 @@
+<odoo>
+
+
+    <!-- Form View -->
+    <record id="view_product_variant_uom_form" model="ir.ui.view">
+        <field name="name">product.variant.uom.form</field>
+        <field name="model">product.product</field>
+        <!--        <field name="inherit_id" ref="product.product_normal_form_view"/>-->
+        <field name="arch" type="xml">
+            <form create="0">
+                <group>
+                    <field name="uom_id" domain="[('category_id', '=', base_uom_category_id)]"/>
+                </group>
+            </form>
+
+        </field>
+    </record>
+
+
+    <record id="action_open_product_variant_uom_form" model="ir.actions.server">
+        <field name="name">Open Product Variant UOM Form</field>
+        <field name="model_id" ref="model_product_product"/>
+        <field name="binding_model_id" ref="model_product_product"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = {
+                'type': 'ir.actions.act_window',
+                'name': 'Product Variant UOM Form',
+                'res_model': 'product.product',
+                'view_mode': 'form',
+                'view_id': env.ref('eo_product_variant_uom.view_product_variant_uom_form').id,
+                'target': 'new',
+                'res_id': record.id,
+            }
+        </field>
+    </record>
+
+
+    <!-- List View -->
+    <record id="view_product_variant_uom_tree" model="ir.ui.view">
+        <field name="name">product.variant.uom.tree</field>
+        <field name="model">product.product</field>
+        <field name="arch" type="xml">
+            <list string="Product Variant UOM" create="0">
+                <field name="name"/>
+                <field name="default_code"/>
+                <field name="product_template_variant_value_ids" string="Attributes" widget="many2many_tags"/>
+                <field name="uom_id" string="UoM"/>
+                <field name="id" column_invisible="1"/>
+                <button name="%(action_open_product_variant_uom_form)d" type="action" string="Open" icon="fa-external-link"/>
+            </list>
+        </field>
+    </record>
+    <!-- Action for the menu -->
+    <record id="action_product_variant_uom" model="ir.actions.act_window">
+        <field name="name">Product Variant UOM</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'list', 'view_id': ref('view_product_variant_uom_tree')}),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('view_product_variant_uom_form')})]"/>
+        <field name="domain">[('product_template_variant_value_ids.attribute_id.name', '=', 'Quantity')]</field>
+        <field name="context">{}</field>
+    </record>
+    <!-- Menu Item -->
+    <menuitem
+            id="menu_product_variant_uom"
+            name="Product Variant UOM"
+            parent="stock.menu_product_in_config_stock"
+            action="action_product_variant_uom"
+            sequence="10"
+    />
+</odoo>
